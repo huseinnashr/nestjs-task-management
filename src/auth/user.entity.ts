@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   Unique,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Task } from 'src/tasks/task.entity';
 
 @Entity()
 @Unique(['username'])
@@ -21,6 +23,13 @@ export class User extends BaseEntity {
 
   @Column()
   salt: string;
+
+  @OneToMany(
+    () => Task,
+    task => task.user,
+    { eager: true },
+  )
+  tasks: Task[];
 
   async setPassword(password: string): Promise<void> {
     this.salt = await bcrypt.genSalt();
