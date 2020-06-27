@@ -23,11 +23,11 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { User } from 'src/auth/user.entity';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  @UseGuards(AuthGuard())
   getAllTasks(
     @Query(ValidationPipe) filterDto: GetTasksFilterDto,
     @CurrentUser() user: User,
@@ -36,7 +36,6 @@ export class TasksController {
   }
 
   @Get('/:id')
-  @UseGuards(AuthGuard())
   getTaskById(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: User,
@@ -46,7 +45,6 @@ export class TasksController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  @UseGuards(AuthGuard())
   createTask(
     @Body() createTaskDto: CreateTaskDto,
     @CurrentUser() user: User,
@@ -60,7 +58,6 @@ export class TasksController {
   }
 
   @Patch('/:id/status')
-  @UseGuards(AuthGuard())
   updateTaskStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status', TaskStatusValidationPipe) status: TaskStatus,
