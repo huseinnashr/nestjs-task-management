@@ -17,10 +17,15 @@ export class User extends BaseEntity {
   username: string;
 
   @Column()
-  password: string;
+  private password: string;
 
   @Column()
   salt: string;
+
+  async setPassword(password: string): Promise<void> {
+    this.salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(password, this.salt);
+  }
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
