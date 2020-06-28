@@ -4,6 +4,7 @@ import { TaskRepository } from './task.repository';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatus } from './task-status.enum';
 import { User } from '../auth/user.entity';
+import { CreateTaskDto } from './dto/create-task.dto';
 
 const mockUser = new User();
 mockUser.id = 12;
@@ -12,11 +13,13 @@ mockUser.username = 'Test User';
 interface mockTaskRepository {
   getTasks: jest.Mock<any, any>;
   findOne: jest.Mock<any, any>;
+  createTask: jest.Mock<any, any>;
 }
 
 const mockTaskRepository = (): mockTaskRepository => ({
   getTasks: jest.fn(),
   findOne: jest.fn(),
+  createTask: jest.fn(),
 });
 
 describe('TaskService', () => {
@@ -66,6 +69,24 @@ describe('TaskService', () => {
           userId: mockUser.id,
         },
       });
+    });
+  });
+
+  describe('createTask', () => {
+    it('calls taskRepository.create() and returns the result', async () => {
+      taskRepository.createTask.mockResolvedValue('someTask');
+
+      expect(taskRepository.createTask).not.toHaveBeenCalled();
+      const createTaskDto: CreateTaskDto = {
+        title: 'Test task',
+        description: 'Test desc',
+      };
+      const result = await tasksService.createTask(createTaskDto, mockUser);
+      expect(taskRepository.createTask).toHaveBeenCalledWith(
+        createTaskDto,
+        mockUser,
+      );
+      expect(result).toEqual('someTask');
     });
   });
 });
