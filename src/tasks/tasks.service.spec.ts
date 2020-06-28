@@ -11,10 +11,12 @@ mockUser.username = 'Test User';
 
 interface mockTaskRepository {
   getTasks: jest.Mock<any, any>;
+  findOne: jest.Mock<any, any>;
 }
 
 const mockTaskRepository = (): mockTaskRepository => ({
   getTasks: jest.fn(),
+  findOne: jest.fn(),
 });
 
 describe('TaskService', () => {
@@ -45,6 +47,25 @@ describe('TaskService', () => {
       const result = await tasksService.getTasks(filters, mockUser);
       expect(taskRepository.getTasks).toHaveBeenCalled();
       expect(result).toEqual('someValue');
+    });
+  });
+
+  describe('getTaskById', () => {
+    it('calls taskRepository.findOne() and succesfully and return the task', async () => {
+      const mockTask = {
+        title: 'Test task',
+        description: 'Test desc',
+      };
+      taskRepository.findOne.mockResolvedValue(mockTask);
+
+      const result = await tasksService.getTaskById(1, mockUser);
+      expect(result).toEqual(mockTask);
+      expect(taskRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+          userId: mockUser.id,
+        },
+      });
     });
   });
 });
