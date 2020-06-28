@@ -3,16 +3,23 @@ import { TasksService } from './tasks.service';
 import { TaskRepository } from './task.repository';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatus } from './task-status.enum';
+import { User } from '../auth/user.entity';
 
-const mockUser = { username: 'Test User' };
+const mockUser = new User();
+mockUser.id = 12;
+mockUser.username = 'Test User';
 
-const mockTaskRepository = () => ({
+interface mockTaskRepository {
+  getTasks: jest.Mock<any, any>;
+}
+
+const mockTaskRepository = (): mockTaskRepository => ({
   getTasks: jest.fn(),
 });
 
 describe('TaskService', () => {
-  let tasksService: any;
-  let taskRepository: any;
+  let tasksService: TasksService;
+  let taskRepository: mockTaskRepository;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -23,7 +30,7 @@ describe('TaskService', () => {
     }).compile();
 
     tasksService = module.get<TasksService>(TasksService);
-    taskRepository = module.get<TaskRepository>(TaskRepository);
+    taskRepository = module.get<any>(TaskRepository);
   });
 
   describe('getTasks', () => {
